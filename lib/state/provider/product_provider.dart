@@ -3,7 +3,7 @@ import '../../domain/entities/product.dart';
 
 class ProductProvider extends ChangeNotifier {
   // Lista inicial de produtos
-  List<Product> _products = [
+  final List<Product> _products = [
     Product(id: '1', name: 'Notebook', price: 3500.0, imageUrl: ''),
     Product(id: '2', name: 'Mouse', price: 120.0, imageUrl: ''),
     Product(id: '3', name: 'Teclado', price: 250.0, imageUrl: ''),

@@ -4,7 +4,7 @@ import 'product_event.dart';
 import 'product_state.dart';
 
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
-  List<Product> _products = [
+  final List<Product> _products = [
     Product(id: '1', name: 'Notebook', price: 3500.0, imageUrl: ''),
     Product(id: '2', name: 'Mouse', price: 120.0, imageUrl: ''),
     Product(id: '3', name: 'Teclado', price: 250.0, imageUrl: ''),

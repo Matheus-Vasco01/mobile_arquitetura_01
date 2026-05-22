@@ -1,20 +1,82 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../domain/entities/product.dart';
+import '../../state/provider/product_api_provider.dart';
 
-class ProductDetailPage extends StatelessWidget {
+class ProductDetailPage extends StatefulWidget {
   final Product product;
 
   const ProductDetailPage({super.key, required this.product});
+
+  @override
+  State<ProductDetailPage> createState() => _ProductDetailPageState();
+}
+
+class _ProductDetailPageState extends State<ProductDetailPage> {
+  late Product _currentProduct;
+  bool _isLoadingDetails = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentProduct = widget.product;
+    // Agendar o carregamento dos detalhes após o build inicial
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchProductDetails();
+    });
+  }
+
+  Future<void> _fetchProductDetails() async {
+    setState(() {
+      _isLoadingDetails = true;
+      _error = null;
+    });
+
+    try {
+      final repository = Provider.of<ProductApiProvider>(context, listen: false).repository;
+      final freshProduct = await repository.getProductById(_currentProduct.id);
+      if (mounted) {
+        setState(() {
+          _currentProduct = freshProduct;
+          _isLoadingDetails = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = "Erro ao carregar dados em tempo real da API.";
+          _isLoadingDetails = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "mobile",
+          "Velour",
           style: GoogleFonts.playfairDisplay(fontWeight: FontWeight.bold),
         ),
+        actions: [
+          if (_isLoadingDetails)
+            const Padding(
+              padding: EdgeInsets.only(right: 16.0),
+              child: Center(
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B1123)),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -25,13 +87,48 @@ class ProductDetailPage extends StatelessWidget {
               height: 400,
               color: const Color(0xFFF9F9F9),
               padding: const EdgeInsets.all(32),
-              child: product.imageUrl != null
+              child: _currentProduct.imageUrl != null
                   ? Image.network(
-                      product.imageUrl!,
+                      _currentProduct.imageUrl!,
                       fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.image_not_supported, size: 100),
                     )
                   : const Icon(Icons.image, size: 100),
             ),
+            if (_error != null)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                color: Colors.amber.shade50,
+                child: Row(
+                  children: [
+                    Icon(Icons.warning_amber_rounded, color: Colors.amber.shade800, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        _error!,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 12,
+                          color: Colors.amber.shade900,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: _fetchProductDetails,
+                      child: Text(
+                        "TENTAR NOVAMENTE",
+                        style: GoogleFonts.montserrat(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF6B1123),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
@@ -42,24 +139,28 @@ class ProductDetailPage extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          product.name,
+                          _currentProduct.name,
                           style: Theme.of(context).textTheme.headlineMedium,
                         ),
                       ),
                       IconButton(
                         icon: Icon(
-                          product.favorite
+                          _currentProduct.favorite
                               ? Icons.favorite
                               : Icons.favorite_border,
                           color: const Color(0xFF6B1123),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          setState(() {
+                            _currentProduct.favorite = !_currentProduct.favorite;
+                          });
+                        },
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'R\$ ${product.price.toStringAsFixed(2)}',
+                    'R\$ ${_currentProduct.price.toStringAsFixed(2)}',
                     style: GoogleFonts.montserrat(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -78,7 +179,7 @@ class ProductDetailPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    product.description ?? 'Sem descrição disponível.',
+                    _currentProduct.description ?? 'Sem descrição disponível.',
                     style: GoogleFonts.montserrat(
                       fontSize: 16,
                       height: 1.6,

@@ -2,7 +2,6 @@ import '../../domain/entities/product.dart';
 import '../../domain/repositories/product_repository.dart';
 import '../datasources/product_remote_data_source.dart';
 import '../datasources/product_local_data_source.dart';
-import '../models/product_model.dart';
 
 class ProductRepositoryImpl implements ProductRepository {
   final ProductRemoteDataSource remoteDataSource;
@@ -60,5 +59,10 @@ class ProductRepositoryImpl implements ProductRepository {
         'women\'s clothing'
       ];
     }
+  }
+
+  @override
+  Future<Product> getProductById(String id) async {
+    return await remoteDataSource.getProductById(id);
   }
 }

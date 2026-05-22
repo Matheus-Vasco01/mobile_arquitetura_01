@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart' as provider_pkg;
+import '../../core/session/session_manager.dart';
 import '../../domain/entities/product.dart';
 import '../../state/bloc/product_api_bloc.dart';
 import '../../state/bloc/product_api_event.dart';
@@ -59,15 +61,34 @@ class _BlocApiProductPageState extends State<BlocApiProductPage> {
 
   @override
   Widget build(BuildContext context) {
+    final session = provider_pkg.Provider.of<SessionManager>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "mobile",
+          "Velour",
           style: GoogleFonts.playfairDisplay(
             fontWeight: FontWeight.bold,
           ),
         ),
         actions: [
+          if (session.isLoggedIn) ...[
+            Padding(
+              padding: const EdgeInsets.only(right: 4.0),
+              child: CircleAvatar(
+                backgroundImage: NetworkImage(session.currentUser!.image),
+                radius: 16,
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.logout, color: Color(0xFF6B1123)),
+              tooltip: "Sair",
+              onPressed: () {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                session.logout();
+              },
+            ),
+          ],
           IconButton(
             icon: const Icon(Icons.shopping_bag_outlined),
             onPressed: () {},
@@ -124,7 +145,7 @@ class _BlocApiProductPageState extends State<BlocApiProductPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                       side: BorderSide(
-                        color: isSelected ? Colors.transparent : const Color(0xFF6B1123).withOpacity(0.2),
+                        color: isSelected ? Colors.transparent : const Color(0xFF6B1123).withValues(alpha: 0.2),
                       ),
                     ),
                     showCheckmark: false,

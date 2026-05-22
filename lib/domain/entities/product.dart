@@ -41,7 +41,7 @@ class Product {
       name: json['title'] ?? json['name'] ?? 'Produto sem nome',
       price: (json['price'] as num).toDouble(),
       description: json['description'],
-      imageUrl: json['image'] ?? json['imageUrl'],
+      imageUrl: json['thumbnail'] ?? json['image'] ?? json['imageUrl'],
       favorite: json['favorite'] ?? false,
     );
   }

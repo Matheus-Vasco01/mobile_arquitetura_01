@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'presentation/pages/home_page.dart';
+import 'presentation/pages/login_page.dart';
 import 'state/provider/counter_provider.dart';
 import 'state/provider/product_provider.dart';
 import 'state/provider/product_api_provider.dart';
@@ -15,6 +16,7 @@ import 'state/bloc/product_api_bloc.dart';
 import 'data/datasources/product_remote_data_source.dart';
 import 'data/datasources/product_local_data_source.dart';
 import 'data/repositories/product_repository_impl.dart';
+import 'core/session/session_manager.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
@@ -37,6 +39,9 @@ void main() async {
       ],
       child: provider.MultiProvider(
         providers: [
+          provider.ChangeNotifierProvider(
+            create: (_) => SessionManager(),
+          ),
           provider.ChangeNotifierProvider(
             create: (_) => CounterProvider(),
           ),
@@ -134,7 +139,15 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const HomePage(),
+      home: provider.Consumer<SessionManager>(
+        builder: (context, session, _) {
+          if (session.isLoggedIn) {
+            return const HomePage();
+          } else {
+            return const LoginPage();
+          }
+        },
+      ),
     );
   }
 }

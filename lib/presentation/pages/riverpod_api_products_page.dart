@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/entities/product.dart';
 import '../../state/riverpod/product_riverpod_api.dart';
 import 'product_detail_page.dart';
 
