@@ -6,8 +6,13 @@ import '../../state/provider/product_api_provider.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final Product product;
+  final ValueChanged<bool>? onFavoriteChanged;
 
-  const ProductDetailPage({super.key, required this.product});
+  const ProductDetailPage({
+    super.key,
+    required this.product,
+    this.onFavoriteChanged,
+  });
 
   @override
   State<ProductDetailPage> createState() => _ProductDetailPageState();
@@ -39,7 +44,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       final freshProduct = await repository.getProductById(_currentProduct.id);
       if (mounted) {
         setState(() {
-          _currentProduct = freshProduct;
+          final wasFavorite = _currentProduct.favorite;
+          _currentProduct = freshProduct.copyWith(favorite: wasFavorite);
           _isLoadingDetails = false;
         });
       }
@@ -154,6 +160,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           setState(() {
                             _currentProduct.favorite = !_currentProduct.favorite;
                           });
+                          widget.onFavoriteChanged?.call(_currentProduct.favorite);
                         },
                       ),
                     ],

@@ -83,8 +83,14 @@ class _RiverpodApiProductPageState
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  ProductDetailPage(product: product),
+                              builder: (context) => ProductDetailPage(
+                                product: product,
+                                onFavoriteChanged: (isFavorite) {
+                                  ref
+                                      .read(productApiProvider.notifier)
+                                      .toggleFavorite(product.id);
+                                },
+                              ),
                             ),
                           );
                         },

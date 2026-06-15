@@ -205,7 +205,14 @@ class _BlocApiProductPageState extends State<BlocApiProductPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductDetailPage(product: product),
+            builder: (context) => ProductDetailPage(
+              product: product,
+              onFavoriteChanged: (isFavorite) {
+                context
+                    .read<ProductApiBloc>()
+                    .add(ToggleFavoriteApiEvent(product.id));
+              },
+            ),
           ),
         );
       },

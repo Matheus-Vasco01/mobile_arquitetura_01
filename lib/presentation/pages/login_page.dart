@@ -372,10 +372,10 @@ class _LoginPageState extends State<LoginPage> {
                                 children: [
                                   Row(
                                     children: [
-                                      const Icon(Icons.info_outline, color: Color(0xFF6B1123), size: 18),
+                                      const Icon(Icons.auto_awesome, color: Color(0xFF6B1123), size: 18),
                                       const SizedBox(width: 8),
                                       Text(
-                                        "Sugestão de Teste (DummyJSON)",
+                                        "Preencher Automaticamente",
                                         style: GoogleFonts.montserrat(
                                           color: const Color(0xFF6B1123),
                                           fontWeight: FontWeight.bold,
@@ -386,7 +386,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    "Clique aqui para preencher automaticamente com um usuário e senha válidos.",
+                                    "Clique aqui para inserir usuário e senha válidos da API de teste (DummyJSON).",
                                     style: GoogleFonts.montserrat(
                                       color: Colors.grey[700],
                                       fontSize: 11,

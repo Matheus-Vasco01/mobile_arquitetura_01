@@ -107,8 +107,12 @@ class _ProviderApiProductPageState extends State<ProviderApiProductPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                ProductDetailPage(product: product),
+                            builder: (context) => ProductDetailPage(
+                              product: product,
+                              onFavoriteChanged: (isFavorite) {
+                                provider.toggleFavorite(product.id);
+                              },
+                            ),
                           ),
                         );
                       },

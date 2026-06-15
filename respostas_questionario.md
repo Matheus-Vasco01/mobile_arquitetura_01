@@ -31,3 +31,10 @@ As principais mudanças foram:
 
 ### 8. Quais dificuldades você encontrou durante a adaptação do projeto para múltiplas telas?
 A principal dificuldade foi garantir a consistência entre as diferentes implementações de estado (Provider, BLoC, Riverpod) para que todas navegassem corretamente para a mesma tela de detalhes, mantendo a integridade dos dados e o comportamento esperado do `Navigator`.
+
+### 9. Justificativa das Escolhas de Gerenciamento de Estado no Projeto
+No projeto final consolidado, foram adotadas as seguintes estratégias para gerenciamento de estado:
+
+*   **Sessão do Usuário (SessionManager):** Implementado utilizando **Provider** (`ChangeNotifier`). O Provider foi escolhido para a sessão global por sua simplicidade e acoplamento direto com o ciclo de vida do Flutter. Por se tratar de um estado que afeta toda a aplicação (autenticado vs não autenticado), o escopo global do Provider provê acesso rápido e direto a qualquer widget da árvore, notificando as telas para redesenho imediato no login ou logout.
+*   **Listagem de Produtos e Favoritos (ProductApiBloc):** Implementado com **BLoC**. O BLoC foi a escolha principal para a tela de catálogo por sua arquitetura orientada a Eventos e Estados. Essa abordagem separa rigidamente a lógica de negócio da interface gráfica. Estados como carregamento (`ProductApiLoadingState`), sucesso (`ProductApiLoadedState`) e erro (`ProductApiErrorState`) são definidos explicitamente, tornando o fluxo altamente testável, previsível e escalável para cenários complexos do e-commerce.
+*   **Carregamento de Detalhes do Produto:** Na `ProductDetailPage`, optou-se por **setState** para controlar variáveis de estado puramente locais (como o estado de carregamento e mensagens de erro do detalhe específico). No entanto, o controle de favoritos da tela de detalhes foi integrado reativamente aos gerenciadores globais (BLoC ou Provider da listagem correspondente) via callbacks (`onFavoriteChanged`), garantindo consistência instantânea dos dados entre a tela de listagem e de detalhes.
