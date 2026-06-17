@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../core/session/session_manager.dart';
 import 'bloc_api_products_page.dart';
+import 'favorites_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -37,6 +38,18 @@ class HomePage extends StatelessWidget {
               },
             ),
           ],
+          IconButton(
+            icon: const Icon(Icons.favorite_border, color: Color(0xFF6B1123)),
+            tooltip: "Favoritos",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const FavoritesPage(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.shopping_bag_outlined),
             onPressed: () {},
@@ -100,6 +113,25 @@ class HomePage extends StatelessWidget {
                 context, Icons.checkroom, "Moda Masculina", "men's clothing"),
             _buildDrawerItem(context, Icons.person_outline, "Moda Feminina",
                 "women's clothing"),
+            ListTile(
+              leading: const Icon(Icons.favorite_outline, color: Color(0xFF6B1123)),
+              title: Text(
+                "Meus Favoritos",
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF333333),
+                ),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const FavoritesPage(),
+                  ),
+                );
+              },
+            ),
             const Spacer(),
             if (session.isLoggedIn)
               ListTile(

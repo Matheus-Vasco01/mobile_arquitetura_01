@@ -8,6 +8,7 @@ import '../../state/bloc/product_api_bloc.dart';
 import '../../state/bloc/product_api_event.dart';
 import '../../state/bloc/product_api_state.dart';
 import 'product_detail_page.dart';
+import 'favorites_page.dart';
 
 class BlocApiProductPage extends StatefulWidget {
   final String? initialCategory;
@@ -89,6 +90,18 @@ class _BlocApiProductPageState extends State<BlocApiProductPage> {
               },
             ),
           ],
+          IconButton(
+            icon: const Icon(Icons.favorite_border, color: Color(0xFF6B1123)),
+            tooltip: "Favoritos",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const FavoritesPage(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.shopping_bag_outlined),
             onPressed: () {},

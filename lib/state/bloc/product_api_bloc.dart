@@ -51,8 +51,35 @@ class ProductApiBloc extends Bloc<ProductApiEvent, ProductApiState> {
   ) async {
     final index = _products.indexWhere((p) => p.id == event.productId);
     if (index != -1) {
-      _products[index].favorite = !_products[index].favorite;
+      final product = _products[index];
+      product.favorite = !product.favorite;
+      
+      try {
+        final favorites = await repository.getFavoriteProducts();
+        if (product.favorite) {
+          if (!favorites.any((p) => p.id == product.id)) {
+            favorites.add(product);
+          }
+        } else {
+          favorites.removeWhere((p) => p.id == product.id);
+        }
+        await repository.saveFavoriteProducts(favorites);
+      } catch (_) {}
+      
       emit(ProductApiLoadedState(List.from(_products)));
+    } else {
+      try {
+        final favorites = await repository.getFavoriteProducts();
+        final favIndex = favorites.indexWhere((p) => p.id == event.productId);
+        if (favIndex != -1) {
+          favorites.removeAt(favIndex);
+        } else {
+          final freshProduct = await repository.getProductById(event.productId);
+          freshProduct.favorite = true;
+          favorites.add(freshProduct);
+        }
+        await repository.saveFavoriteProducts(favorites);
+      } catch (_) {}
     }
   }
 

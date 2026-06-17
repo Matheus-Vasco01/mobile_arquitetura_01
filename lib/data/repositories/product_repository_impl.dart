@@ -12,15 +12,29 @@ class ProductRepositoryImpl implements ProductRepository {
     required this.localDataSource,
   });
 
+  Future<List<Product>> _syncFavorites(List<Product> products) async {
+    try {
+      final favorites = await localDataSource.getFavoriteProducts();
+      final favoriteIds = favorites.map((p) => p.id).toSet();
+      for (var product in products) {
+        product.favorite = favoriteIds.contains(product.id);
+      }
+    } catch (_) {
+      // Ignora falhas e retorna a lista original
+    }
+    return products;
+  }
+
   @override
   Future<List<Product>> getProducts() async {
     try {
       final remoteProducts = await remoteDataSource.getProducts();
       await localDataSource.cacheProducts(remoteProducts);
-      return remoteProducts;
+      return _syncFavorites(remoteProducts);
     } catch (e) {
       try {
-        return await localDataSource.getLastProducts();
+        final cached = await localDataSource.getLastProducts();
+        return _syncFavorites(cached);
       } catch (cacheError) {
         throw Exception(
             'Erro ao carregar dados: $e e cache vazio: $cacheError');
@@ -33,13 +47,13 @@ class ProductRepositoryImpl implements ProductRepository {
     try {
       final remoteProducts =
           await remoteDataSource.getProductsByCategory(category);
-      // O cache por categoria é opcional, mas vamos simplificar aqui
-      return remoteProducts;
+      return _syncFavorites(remoteProducts);
     } catch (e) {
       // Se falhar a categoria, tentamos o cache geral
       try {
         final cached = await localDataSource.getLastProducts();
-        return cached.where((p) => true).toList(); // simplificado
+        final filtered = cached.where((p) => true).toList(); // simplificado
+        return _syncFavorites(filtered);
       } catch (cacheError) {
         throw Exception(
             'Erro ao carregar dados por categoria e cache indisponível');
@@ -63,6 +77,19 @@ class ProductRepositoryImpl implements ProductRepository {
 
   @override
   Future<Product> getProductById(String id) async {
-    return await remoteDataSource.getProductById(id);
+    final product = await remoteDataSource.getProductById(id);
+    final favorites = await localDataSource.getFavoriteProducts();
+    product.favorite = favorites.any((p) => p.id == product.id);
+    return product;
+  }
+
+  @override
+  Future<List<Product>> getFavoriteProducts() async {
+    return await localDataSource.getFavoriteProducts();
+  }
+
+  @override
+  Future<void> saveFavoriteProducts(List<Product> favorites) async {
+    await localDataSource.saveFavoriteProducts(favorites);
   }
 }
